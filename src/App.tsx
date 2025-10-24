@@ -234,8 +234,10 @@ const App: React.FC = () => {
         if (formData[fieldKey as keyof FormData] && String(formData[fieldKey as keyof FormData]).trim()) {
             isFieldValid = true;
         } else {
-          // FIX: Explicitly convert `fieldKey` to a string to avoid implicit conversion errors at runtime if it is a symbol.
-          if (!alertMessage) alertMessage = `Falta campo requerido: ${String(fieldKey)}`;
+          if (!alertMessage) {
+            // FIX: Explicitly convert `fieldKey` to a string to avoid implicit conversion error at runtime if it is a symbol.
+            alertMessage = `Falta campo requerido: ${String(fieldKey)}`;
+          }
         }
       }
       if (!isFieldValid) isValid = false;

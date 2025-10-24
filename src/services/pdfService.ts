@@ -1,4 +1,4 @@
-import type { FormData } from '../types';
+import type { FormData, Owner } from '../types';
 import { logoUrl } from '../assets';
 
 declare const jspdf: any;
@@ -167,17 +167,56 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
 
   // --- 2) Propietarios ---
   drawSectionTitle('2) Propietarios');
-  formData.owners.forEach((owner, index) => {
-      checkPageBreak(60);
-      doc.setFont('helvetica', 'bold');
-      doc.text(`Propietario ${index + 1}:`, m, y); y += 18;
-      doc.setFont('helvetica', 'normal');
-      drawKeyValue('Nombre:', owner.nombre);
-      drawKeyValue('Teléfono:', owner.telefono);
-      drawKeyValue('DNI/NIE:', owner.dni);
-      if (owner.email) drawKeyValue('Email:', owner.email);
-      y += 5;
-  });
+  const ownerCount = formData.owners.length;
+  const ownerBoxWidth = (fullW / 2) - 10;
+
+  for (let i = 0; i < ownerCount; i += 2) {
+      const owner1 = formData.owners[i];
+      const owner2 = i + 1 < ownerCount ? formData.owners[i + 1] : null;
+
+      checkPageBreak(80);
+
+      let y1 = y;
+      let y2 = y;
+      const col1X = m;
+      const col2X = m + ownerBoxWidth + 20;
+
+      const drawOwnerDetails = (owner: Owner, startX: number, startY: number, index: number) => {
+          let currentY = startY;
+          doc.setFont('helvetica', 'bold');
+          doc.text(`Propietario ${index + 1}:`, startX, currentY); currentY += 18;
+          doc.setFont('helvetica', 'normal');
+
+          const keyWidth = 60;
+          const valueWidth = ownerBoxWidth - keyWidth;
+
+          const drawKV = (key: string, value: string | undefined | null) => {
+              if (!value || value === '—') return;
+              const lines = doc.splitTextToSize(String(value), valueWidth);
+              checkPageBreak(lines.length * 12 + 3);
+
+              doc.setFont('helvetica', 'bold');
+              doc.text(key, startX, currentY);
+              doc.setFont('helvetica', 'normal');
+              doc.text(lines, startX + keyWidth, currentY);
+              currentY += lines.length * 12 + 3;
+          };
+          
+          drawKV('Nombre:', owner.nombre);
+          drawKV('Teléfono:', owner.telefono);
+          drawKV('DNI/NIE:', owner.dni);
+          if (owner.email) drawKV('Email:', owner.email);
+          return currentY;
+      };
+      
+      y1 = drawOwnerDetails(owner1, col1X, y1, i);
+
+      if (owner2) {
+          y2 = drawOwnerDetails(owner2, col2X, y2, i + 1);
+      }
+
+      y = Math.max(y1, y2) + 10;
+  }
 
   // --- 3) Inmueble ---
   drawSectionTitle('3) Inmueble');
