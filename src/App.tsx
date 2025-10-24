@@ -209,7 +209,8 @@ const App: React.FC = () => {
           const key = match[2] as keyof Owner;
           if (!formData.owners[index] || !formData.owners[index][key]) {
             isValid = false;
-            if (!alertMessage) alertMessage = `Propietario ${index+1}: Falta ${key}`;
+            // FIX: Explicitly convert `key` to a string to avoid potential implicit conversion errors at runtime.
+            if (!alertMessage) alertMessage = `Propietario ${index+1}: Falta ${String(key)}`;
           }
         }
       } else {

@@ -188,7 +188,6 @@ const App: React.FC = () => {
 
   const handleOwnerChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    // FIX: The field name should be the first part of the input name (e.g., "nombre" from "nombre_0"), not the second part.
     const fieldName = name.split('_')[0] as keyof Owner;
     setFormData(prev => {
       const newOwners = [...prev.owners];
@@ -197,7 +196,7 @@ const App: React.FC = () => {
     });
   };
   
-  const validateAndGenerate = (isPreview = false) => {
+  const validateAndGenerate = async (isPreview = false) => {
     let isValid = true;
     let alertMessage = '';
 
@@ -215,8 +214,6 @@ const App: React.FC = () => {
       } else {
         if (!formData[fieldKey as keyof FormData]) {
           isValid = false;
-          // FIX: Explicitly convert fieldKey to a string to avoid potential runtime errors
-          // when using it in a template literal, as it could be a symbol.
           if (!alertMessage) alertMessage = `Falta campo requerido: ${String(fieldKey)}`;
         }
       }
@@ -228,7 +225,7 @@ const App: React.FC = () => {
     }
 
     try {
-        generatePdf(formData, isPreview);
+        await generatePdf(formData, isPreview);
     } catch(e) {
         console.error("Error generating PDF:", e);
         alert("Ocurrió un error al generar el PDF. Revisa la consola para más detalles.");
