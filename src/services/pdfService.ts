@@ -59,7 +59,7 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
   const drawKeyValue = (key: string, value: string | undefined | null) => {
     if (!value || value === '—') return;
     checkPageBreak(15);
-    const lines = doc.splitTextToSize(String(value), fullW * 0.6);
+    const lines = doc.splitTextToSize(String(value), fullW - 160); // Adjust width for value
     doc.setFont('helvetica', 'bold');
     doc.text(key, m, y);
     doc.setFont('helvetica', 'normal');
@@ -117,9 +117,10 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
   // --- 1) Datos de gestión ---
   drawSectionTitle('1) Datos de gestión');
   const getAgent = () => formData.agente === 'Otro (especificar)' ? formData.agente_otro : formData.agente;
+  const agentName = getAgent();
   drawKeyValue('Referencia:', formData.ref);
   drawKeyValue('Fecha:', new Date(formData.fecha).toLocaleDateString('es-ES'));
-  drawKeyValue('Agente:', getAgent());
+  drawKeyValue('Agente:', agentName);
   drawKeyValue('Modalidad:', formData.categoria === 'A' ? 'Alquiler (A)' : 'Venta');
 
   // --- 2) Propietarios ---
@@ -140,7 +141,12 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
   drawSectionTitle('3) Inmueble');
   drawKeyValue('Tipo:', formData.tipo_vivienda);
   drawKeyValue('Dirección:', formData.dir);
-  if (formData.refcat) drawKeyValue('Ref. Catastral:', formData.refcat);
+  checkPageBreak(15);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Ref. Catastral:', m, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(formData.refcat || '__________________________________', m + 150, y);
+  y += 15;
 
   const residentialTypes = ['Piso', 'Ático', 'Dúplex', 'Bajo', 'Casa/Chalet', 'Adosado', 'Unifamiliar'];
   const landTypes = ['Terreno urbano', 'Terreno rústico'];
@@ -197,15 +203,15 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
     const qrEl = document.getElementById('qr_hidden');
     if (qrEl) {
         qrEl.innerHTML = '';
-        new QRCode(qrEl, { text: formData.ubic_link, width: 90, height: 90 });
+        new QRCode(qrEl, { text: formData.ubic_link, width: 90, height: 90, correctLevel: QRCode.CorrectLevel.M });
         const qrCanvas = qrEl.querySelector('canvas');
         if (qrCanvas) {
             y += 15;
             const qrImg = qrCanvas.toDataURL('image/png');
-            const qrX = (doc.internal.pageSize.width / 2) - 45;
+            const qrX = m;
             doc.addImage(qrImg, 'PNG', qrX, y, 90, 90);
             doc.setFontSize(8).setFont('helvetica', 'normal');
-            doc.text('QR Ubicación', doc.internal.pageSize.width / 2, y + 100, { align: 'center' });
+            doc.text('QR Ubicación', qrX + 45, y + 100, { align: 'center' });
             y += 110;
         }
     }
@@ -284,33 +290,41 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
   y = m;
   drawSectionTitle('7) Firmas');
   y += 10;
-  const colW = (fullW - 20) / 2;
-  const boxH = 80;
-  let x = m;
-  let sigY = y;
-
-  doc.rect(x, sigY, colW, boxH);
-  doc.text('Intermediario (Vida Home Gandia)', x + 10, sigY + boxH + 15);
   
-  x += colW + 20;
-
+  const sigBoxWidth = (fullW - 20) / 2;
+  const sigBoxHeight = 80;
+  const sigYSpacing = sigBoxHeight + 35;
+  let currentY = y;
+  
+  // Agent Signature
+  let currentX = m;
+  doc.rect(currentX, currentY, sigBoxWidth, sigBoxHeight);
+  doc.setFontSize(10).setFont('helvetica', 'normal');
+  doc.text(agentName, currentX + 10, currentY + sigBoxHeight + 15);
+  doc.setFontSize(8).text('Intermediario (Vida Home Gandia)', currentX + 10, currentY + sigBoxHeight + 25);
+  
+  // Owner Signatures
   formData.owners.forEach((owner, i) => {
-    if (i > 0 && i % 2 === 1) { 
-        sigY += boxH + 30;
-        x = m;
-    } else if (i > 0) {
-        x = m + colW + 20;
-    }
-    checkPageBreak(boxH + 30);
-    if(doc.internal.getNumberOfPages() > Math.floor(i / 4) + 2) sigY = m;
-
-
-    doc.rect(x, sigY, colW, boxH);
-    doc.text(`${owner.nombre || `Propietario ${i+1}`} (DNI: ${owner.dni || '-'})`, x + 10, sigY + boxH + 15);
+    const position = i + 1; // Agent is position 0
+    const row = Math.floor(position / 2);
+    const col = position % 2;
     
-    if (i % 2 === 0 && i+1 < formData.owners.length) {
-       x += colW + 20;
+    currentX = m + col * (sigBoxWidth + 20);
+    currentY = y + row * sigYSpacing;
+
+    checkPageBreak(sigYSpacing + m);
+    // If a page break happened, reset currentY for the new page
+    if (doc.internal.pages.length > 2 && currentY < m) {
+        currentY = m;
     }
+
+    doc.rect(currentX, currentY, sigBoxWidth, sigBoxHeight);
+    doc.setFontSize(10).setFont('helvetica', 'normal');
+    doc.text(
+        `${owner.nombre || `Propietario ${i + 1}`} (DNI: ${owner.dni || '---'})`,
+        currentX + 10,
+        currentY + sigBoxHeight + 15
+    );
   });
 
 
