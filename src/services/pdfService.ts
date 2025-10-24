@@ -67,6 +67,43 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
     y += lines.length * 12 + 3;
   };
   
+  const drawKeyValueRow = (
+    key1: string, value1: string | undefined | null,
+    key2: string, value2: string | undefined | null
+  ) => {
+    checkPageBreak(20);
+    
+    const col1X = m;
+    const col2X = m + fullW / 2;
+    const valueOffsetX = 70; // space for the key
+    const valueWidth = (fullW / 2) - valueOffsetX - 5; // 5 for padding
+
+    const value1Safe = (value1 && value1 !== '—') ? String(value1) : '';
+    const value2Safe = (value2 && value2 !== '—') ? String(value2) : '';
+
+    const lines1 = value1Safe ? doc.splitTextToSize(value1Safe, valueWidth) : [''];
+    const lines2 = value2Safe ? doc.splitTextToSize(value2Safe, valueWidth) : [''];
+    
+    const lineHeight = 12;
+    const rowHeight = Math.max(lines1.length, lines2.length) * lineHeight + 5;
+    
+    if (value1Safe) {
+        doc.setFont('helvetica', 'bold');
+        doc.text(key1, col1X, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(lines1, col1X + valueOffsetX, y);
+    }
+
+    if (value2Safe) {
+        doc.setFont('helvetica', 'bold');
+        doc.text(key2, col2X, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(lines2, col2X + valueOffsetX, y);
+    }
+    
+    y += rowHeight;
+  };
+  
   const drawWrappedText = (text: string) => {
     checkPageBreak(15);
     const lines = doc.splitTextToSize(text, fullW);
@@ -118,10 +155,15 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
   drawSectionTitle('1) Datos de gestión');
   const getAgent = () => formData.agente === 'Otro (especificar)' ? formData.agente_otro : formData.agente;
   const agentName = getAgent();
-  drawKeyValue('Referencia:', formData.ref);
-  drawKeyValue('Fecha:', new Date(formData.fecha).toLocaleDateString('es-ES'));
-  drawKeyValue('Agente:', agentName);
-  drawKeyValue('Modalidad:', formData.categoria === 'A' ? 'Alquiler (A)' : 'Venta');
+  
+  drawKeyValueRow(
+    'Referencia:', formData.ref,
+    'Fecha:', new Date(formData.fecha).toLocaleDateString('es-ES')
+  );
+  drawKeyValueRow(
+    'Agente:', agentName,
+    'Modalidad:', formData.categoria === 'A' ? 'Alquiler (A)' : 'Venta'
+  );
 
   // --- 2) Propietarios ---
   drawSectionTitle('2) Propietarios');

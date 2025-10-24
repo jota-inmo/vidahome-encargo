@@ -536,7 +536,7 @@ const App: React.FC = () => {
                     <li><b className="font-semibold">- Aceptación y arras:</b> una vez aceptada por escrito la oferta por la Propiedad, Vida Home elaborará un borrador de contrato de arras, lo ajustará con las partes hasta su conformidad por escrito y coordinará firma e ingreso de las arras.</li>
                     <li><b className="font-semibold">- Arras – destino del ingreso:</b> las arras de la parte compradora se ingresarán en la cuenta del propietario si tiene cuenta en España; si no, se ingresarán en la cuenta de Vida Home para custodia temporal y posterior transferencia o aplicación según contrato de arras.</li>
                     {formData.categoria === 'A' ? (
-                        <li><b className="font-semibold">- Devengo honorarios (alquiler):</b> si Vida Home presenta por escrito un arrendatario que acepta renta/plazo ofrecidos y la Propiedad decide no arrendar en tales términos, se devengan los honorarios pactados. Si se arrienda a ese interesado (o interpuesta) dentro de 24 meses, se devengan.</li>
+                        <li><b className="font-semibold">- Devengo honorarios (alquiler):</b> si Vida Home presenta por escrito un arrendatario que acepta renta/plazo ofrecidos y la Propiedad decide no arrendar en tales términos, se devengan los honorarios pactados. Si se arrienda a ese interesado (o interposta) dentro de 24 meses, se devengan.</li>
                     ) : (
                         <li><b className="font-semibold">- Devengo honorarios (venta):</b> {devengoHonorariosVentaText}</li>
                     )}
