@@ -45,6 +45,14 @@ export interface FormData {
   loc_fach: string;
   loc_alt: string;
   loc_humo: string;
+  loc_m2_util: string;
+  loc_m2_const: string;
+  loc_banos: string;
+  loc_plantas: string;
+  loc_escaparates: string;
+  loc_esquina: string;
+  loc_oficina: string;
+  loc_extras: string[];
 
   // Expenses
   com_mes: string;

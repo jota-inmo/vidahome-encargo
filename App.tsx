@@ -48,6 +48,14 @@ const initialFormData: FormData = {
   loc_fach: '',
   loc_alt: '',
   loc_humo: '—',
+  loc_m2_util: '',
+  loc_m2_const: '',
+  loc_banos: '',
+  loc_plantas: '',
+  loc_escaparates: '',
+  loc_esquina: '—',
+  loc_oficina: '—',
+  loc_extras: [],
   com_mes: '',
   com_der: '—',
   com_obs: '',
@@ -151,7 +159,7 @@ const App: React.FC = () => {
         const [fieldName, fieldValue] = name.split('-');
 
         setFormData(prev => {
-            const currentValues = prev[fieldName as 'vistas' | 'servicios'] as string[];
+            const currentValues = prev[fieldName as 'vistas' | 'servicios' | 'loc_extras'] as string[];
             const newValues = checked
                 ? [...currentValues, fieldValue]
                 : currentValues.filter(v => v !== fieldValue);
@@ -300,7 +308,6 @@ const App: React.FC = () => {
           </Section>
           
           <Section title="3) Inmueble">
-             {/* Property details form elements go here */}
              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Tipo *</label>
@@ -326,7 +333,6 @@ const App: React.FC = () => {
                 <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-3 mt-4">
                     <b className="text-slate-800">Características - Residencial</b>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-                        {/* Fields like rooms, bathrooms, etc. */}
                         <div><label className="block text-sm font-medium text-slate-700 mb-1">Nº Habitaciones</label><input type="number" name="num_habitaciones" value={formData.num_habitaciones} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
                         <div><label className="block text-sm font-medium text-slate-700 mb-1">Nº Baños</label><input type="number" step="0.5" name="num_banos" value={formData.num_banos} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
                         <div><label className="block text-sm font-medium text-slate-700 mb-1">Nº Cocinas</label><input type="number" name="num_cocinas" value={formData.num_cocinas} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
@@ -343,6 +349,81 @@ const App: React.FC = () => {
                     </div>
                 </div>
              )}
+             {localTypes.includes(formData.tipo_vivienda) && (
+                <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-3 mt-4 space-y-4">
+                    <div>
+                        <b className="text-slate-800">Características - {formData.tipo_vivienda}</b>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+                            <div><label className="block text-sm font-medium text-slate-700 mb-1">Sup. útil (m²)</label><input type="number" step="0.1" name="loc_m2_util" value={formData.loc_m2_util} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                            <div><label className="block text-sm font-medium text-slate-700 mb-1">Sup. const. (m²)</label><input type="number" step="0.1" name="loc_m2_const" value={formData.loc_m2_const} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                            <div><label className="block text-sm font-medium text-slate-700 mb-1">Nº Baños</label><input type="number" step="0.5" name="loc_banos" value={formData.loc_banos} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                            <div><label className="block text-sm font-medium text-slate-700 mb-1">Fachada (m)</label><input type="number" step="0.1" name="loc_fach" value={formData.loc_fach} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                            <div><label className="block text-sm font-medium text-slate-700 mb-1">Altura (m)</label><input type="number" step="0.1" name="loc_alt" value={formData.loc_alt} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                            <div><label className="block text-sm font-medium text-slate-700 mb-1">Plantas</label><input type="number" name="loc_plantas" value={formData.loc_plantas} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                            <div><label className="block text-sm font-medium text-slate-700 mb-1">Escaparates</label><input type="number" name="loc_escaparates" value={formData.loc_escaparates} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                            <div><label className="block text-sm font-medium text-slate-700 mb-1">Hace esquina</label><select name="loc_esquina" value={formData.loc_esquina} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-white text-slate-800"><option>—</option><option>Sí</option><option>No</option></select></div>
+                            <div><label className="block text-sm font-medium text-slate-700 mb-1">Tiene oficina</label><select name="loc_oficina" value={formData.loc_oficina} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-white text-slate-800"><option>—</option><option>Sí</option><option>No</option></select></div>
+                            <div><label className="block text-sm font-medium text-slate-700 mb-1">Salida de humos</label><select name="loc_humo" value={formData.loc_humo} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-white text-slate-800"><option>—</option><option>Sí</option><option>No</option></select></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Extras y equipamiento</label>
+                        <div className="flex flex-wrap gap-2">
+                            {['Calefacción', 'Aire acondicionado', 'Cocina equipada', 'Puerta seguridad', 'Alarma', 'CCTV', 'Almacén'].map(extra => (
+                                <label key={extra} className="flex items-center gap-2 border border-slate-300 rounded-full px-3 py-1.5 bg-white text-sm font-semibold cursor-pointer has-[:checked]:bg-sky-100 has-[:checked]:border-sky-400 transition-colors">
+                                    <input type="checkbox" name={`loc_extras-${extra}`} value={extra} checked={formData.loc_extras.includes(extra)} onChange={(e) => handleChange({ target: { name: 'loc_extras-' + extra, value: extra, type: 'checkbox', checked: e.target.checked } } as any)} className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"/>
+                                    {extra}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+             )}
+             {landTypes.includes(formData.tipo_vivienda) && (
+                <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-3 mt-4">
+                    <b className="text-slate-800">Características - Terreno</b>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+                        <div><label className="block text-sm font-medium text-slate-700 mb-1">Clasificación</label><select name="ter_clas" value={formData.ter_clas} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-white"><option>—</option><option>Urbano</option><option>Urbanizable</option><option>Rústico</option></select></div>
+                        <div><label className="block text-sm font-medium text-slate-700 mb-1">Superficie (m²)</label><input type="number" name="ter_m2" value={formData.ter_m2} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                        <div><label className="block text-sm font-medium text-slate-700 mb-1">Edificabilidad (%)</label><input type="number" step="0.01" name="ter_edi" value={formData.ter_edi} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                    </div>
+                </div>
+             )}
+          </Section>
+
+          <Section title="4) Gastos, ocupación y llaves">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+                <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-3 space-y-2">
+                    <b className="text-slate-800">Gastos de la vivienda</b>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label className="block text-sm font-medium text-slate-700 mb-1">Comunidad (€/mes)</label><input type="number" step="0.01" name="com_mes" value={formData.com_mes} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                        <div><label className="block text-sm font-medium text-slate-700 mb-1">Derramas</label><select name="com_der" value={formData.com_der} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-white"><option>—</option><option>Sí</option><option>No</option><option>Pendiente</option></select></div>
+                    </div>
+                    <div><label className="block text-sm font-medium text-slate-700 mb-1">Observaciones derramas</label><input name="com_obs" value={formData.com_obs} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label className="block text-sm font-medium text-slate-700 mb-1">IBI (€/anual)</label><input type="number" step="0.01" name="ibi_anual" value={formData.ibi_anual} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                        <div><label className="block text-sm font-medium text-slate-700 mb-1">Tasa basuras (€)</label><input type="number" step="0.01" name="basura" value={formData.basura} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                    </div>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label className="block text-sm font-medium text-slate-700 mb-1">Agua</label><select name="agua_act" value={formData.agua_act} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-white"><option>—</option><option>Alta</option><option>Baja</option></select></div>
+                        <div><label className="block text-sm font-medium text-slate-700 mb-1">Luz</label><select name="luz_act" value={formData.luz_act} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-white"><option>—</option><option>Alta</option><option>Baja</option></select></div>
+                    </div>
+                </div>
+
+                <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-3 space-y-2">
+                     <b className="text-slate-800">Ocupación y llaves</b>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label className="block text-sm font-medium text-slate-700 mb-1">Ocupación actual</label><select name="ocup" value={formData.ocup} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-white"><option>Libre</option><option>Propietario</option><option>Inquilino</option><option>Okupa</option></select></div>
+                        <div><label className="block text-sm font-medium text-slate-700 mb-1">¿Quién vive?</label><input name="ocupantes" value={formData.ocupantes} onChange={handleChange} placeholder="Nombre, parentesco..." className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                     </div>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div><label className="block text-sm font-medium text-slate-700 mb-1">Disponemos de llaves</label><select name="llaves" value={formData.llaves} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-white"><option>No</option><option>Sí</option></select></div>
+                        <div><label className="block text-sm font-medium text-slate-700 mb-1">Contacto para llaves</label><input name="llaves_contacto" value={formData.llaves_contacto} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                     </div>
+                     <div><label className="block text-sm font-medium text-slate-700 mb-1">Teléfono</label><input name="llaves_tel" value={formData.llaves_tel} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                     <div><label className="block text-sm font-medium text-slate-700 mb-1">Instrucciones</label><input name="llaves_instr" value={formData.llaves_instr} onChange={handleChange} placeholder="Disponibilidad, preaviso..." className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                </div>
+            </div>
           </Section>
 
           <Section title="5) Condiciones económicas y cláusulas">
