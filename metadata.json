@@ -1,0 +1,5 @@
+{
+  "name": "Vida Home - Encargo de Gestión",
+  "description": "Aplicación para generar encargos de gestión inmobiliaria sin exclusiva para Vida Home. Permite rellenar los datos del propietario, inmueble y condiciones, y descargar el documento en formato PDF.",
+  "requestFramePermissions": []
+}
