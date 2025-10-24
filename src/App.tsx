@@ -201,8 +201,8 @@ const App: React.FC = () => {
         if (!formData[fieldKey as keyof FormData]) {
           isValid = false;
           if (!alertMessage) {
-            // FIX: Explicitly convert `fieldKey` to a string to avoid a potential runtime error
-            // from implicit conversion of a symbol to a string.
+            // FIX: Explicitly convert `fieldKey` to a string.
+            // Implicit conversion of a symbol to a string will fail at runtime.
             alertMessage = `Falta campo requerido: ${String(fieldKey)}`;
           }
         }
