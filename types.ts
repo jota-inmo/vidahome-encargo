@@ -54,6 +54,16 @@ export interface FormData {
   loc_oficina: string;
   loc_extras: string[];
 
+  // Garage
+  gar_capacidad: string;
+  gar_m2: string;
+  gar_extras: string[];
+  
+  // Trastero
+  tras_m2_util: string;
+  tras_m2_const: string;
+  tras_extras: string[];
+
   // Expenses
   com_mes: string;
   com_der: string;

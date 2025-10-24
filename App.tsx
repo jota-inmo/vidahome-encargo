@@ -56,6 +56,12 @@ const initialFormData: FormData = {
   loc_esquina: '—',
   loc_oficina: '—',
   loc_extras: [],
+  gar_capacidad: '—',
+  gar_m2: '',
+  gar_extras: [],
+  tras_m2_util: '',
+  tras_m2_const: '',
+  tras_extras: [],
   com_mes: '',
   com_der: '—',
   com_obs: '',
@@ -85,7 +91,6 @@ const App: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState('Guardado automático activo');
 
   const residentialTypes = ['Piso', 'Ático', 'Dúplex', 'Bajo', 'Casa/Chalet', 'Adosado', 'Unifamiliar'];
-  const localTypes = ['Local', 'Garaje', 'Trastero'];
   const landTypes = ['Terreno urbano', 'Terreno rústico'];
   const showsParcela = ['Casa/Chalet', 'Adosado', 'Unifamiliar'].includes(formData.tipo_vivienda);
 
@@ -159,7 +164,7 @@ const App: React.FC = () => {
         const [fieldName, fieldValue] = name.split('-');
 
         setFormData(prev => {
-            const currentValues = prev[fieldName as 'vistas' | 'servicios' | 'loc_extras'] as string[];
+            const currentValues = prev[fieldName as 'vistas' | 'servicios' | 'loc_extras' | 'gar_extras' | 'tras_extras'] as string[];
             const newValues = checked
                 ? [...currentValues, fieldValue]
                 : currentValues.filter(v => v !== fieldValue);
@@ -183,7 +188,8 @@ const App: React.FC = () => {
 
   const handleOwnerChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const fieldName = name.split('_')[1] as keyof Owner;
+    // FIX: The field name should be the first part of the input name (e.g., "nombre" from "nombre_0"), not the second part.
+    const fieldName = name.split('_')[0] as keyof Owner;
     setFormData(prev => {
       const newOwners = [...prev.owners];
       newOwners[index] = { ...newOwners[index], [fieldName]: value };
@@ -349,10 +355,10 @@ const App: React.FC = () => {
                     </div>
                 </div>
              )}
-             {localTypes.includes(formData.tipo_vivienda) && (
+             {formData.tipo_vivienda === 'Local' && (
                 <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-3 mt-4 space-y-4">
                     <div>
-                        <b className="text-slate-800">Características - {formData.tipo_vivienda}</b>
+                        <b className="text-slate-800">Características - Local</b>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
                             <div><label className="block text-sm font-medium text-slate-700 mb-1">Sup. útil (m²)</label><input type="number" step="0.1" name="loc_m2_util" value={formData.loc_m2_util} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
                             <div><label className="block text-sm font-medium text-slate-700 mb-1">Sup. const. (m²)</label><input type="number" step="0.1" name="loc_m2_const" value={formData.loc_m2_const} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
@@ -371,7 +377,63 @@ const App: React.FC = () => {
                         <div className="flex flex-wrap gap-2">
                             {['Calefacción', 'Aire acondicionado', 'Cocina equipada', 'Puerta seguridad', 'Alarma', 'CCTV', 'Almacén'].map(extra => (
                                 <label key={extra} className="flex items-center gap-2 border border-slate-300 rounded-full px-3 py-1.5 bg-white text-sm font-semibold cursor-pointer has-[:checked]:bg-sky-100 has-[:checked]:border-sky-400 transition-colors">
-                                    <input type="checkbox" name={`loc_extras-${extra}`} value={extra} checked={formData.loc_extras.includes(extra)} onChange={(e) => handleChange({ target: { name: 'loc_extras-' + extra, value: extra, type: 'checkbox', checked: e.target.checked } } as any)} className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"/>
+                                    <input type="checkbox" name={`loc_extras-${extra}`} checked={formData.loc_extras.includes(extra)} onChange={(e) => handleChange({ target: { name: 'loc_extras-' + extra, value: extra, type: 'checkbox', checked: e.target.checked } } as any)} className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"/>
+                                    {extra}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+             )}
+             {formData.tipo_vivienda === 'Garaje' && (
+                <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-3 mt-4 space-y-4">
+                    <div>
+                        <b className="text-slate-800">Características - Garaje</b>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Capacidad de la plaza</label>
+                                <select name="gar_capacidad" value={formData.gar_capacidad} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-white text-slate-800">
+                                    <option>—</option>
+                                    <option>Coche grande</option>
+                                    <option>Coche mediano</option>
+                                    <option>Coche pequeño</option>
+                                    <option>Moto</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Superficie (m²)</label>
+                                <input type="number" step="0.1" name="gar_m2" value={formData.gar_m2} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" />
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Extras y equipamiento</label>
+                        <div className="flex flex-wrap gap-2">
+                            {['Ascensor', 'Personal de seguridad', 'Plaza cubierta', 'Sistemas de alarma', 'Circuito cerrado de seguridad', 'Puerta automática'].map(extra => (
+                                <label key={extra} className="flex items-center gap-2 border border-slate-300 rounded-full px-3 py-1.5 bg-white text-sm font-semibold cursor-pointer has-[:checked]:bg-sky-100 has-[:checked]:border-sky-400 transition-colors">
+                                    <input type="checkbox" name={`gar_extras-${extra}`} checked={formData.gar_extras.includes(extra)} onChange={(e) => handleChange({ target: { name: 'gar_extras-' + extra, value: extra, type: 'checkbox', checked: e.target.checked } } as any)} className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"/>
+                                    {extra}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+             )}
+             {formData.tipo_vivienda === 'Trastero' && (
+                <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-3 mt-4 space-y-4">
+                    <div>
+                        <b className="text-slate-800">Características - Trastero</b>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                            <div><label className="block text-sm font-medium text-slate-700 mb-1">Sup. útil (m²)</label><input type="number" step="0.1" name="tras_m2_util" value={formData.tras_m2_util} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                            <div><label className="block text-sm font-medium text-slate-700 mb-1">Sup. const. (m²)</label><input type="number" step="0.1" name="tras_m2_const" value={formData.tras_m2_const} onChange={handleChange} className="w-full p-2.5 border border-slate-300 rounded-lg text-sm" /></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Extras y equipamiento</label>
+                        <div className="flex flex-wrap gap-2">
+                            {['Acceso 24h', 'Alarma', 'CCTV', 'Zona carga/descarga'].map(extra => (
+                                <label key={extra} className="flex items-center gap-2 border border-slate-300 rounded-full px-3 py-1.5 bg-white text-sm font-semibold cursor-pointer has-[:checked]:bg-sky-100 has-[:checked]:border-sky-400 transition-colors">
+                                    <input type="checkbox" name={`tras_extras-${extra}`} checked={formData.tras_extras.includes(extra)} onChange={(e) => handleChange({ target: { name: 'tras_extras-' + extra, value: extra, type: 'checkbox', checked: e.target.checked } } as any)} className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"/>
                                     {extra}
                                 </label>
                             ))}
