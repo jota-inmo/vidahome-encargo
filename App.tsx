@@ -84,6 +84,7 @@ const requiredFields: (keyof FormData)[] = ['ref', 'fecha', 'agente', 'tipo_vivi
 
 const App: React.FC = () => {
   const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [validationStatus, setValidationStatus] = useState<ValidationStatus>({});
   const [progress, setProgress] = useState(0);
   const [pendingFields, setPendingFields] = useState(requiredFields.length);
@@ -212,7 +213,7 @@ const App: React.FC = () => {
     });
   };
   
-  const validateAndGenerate = (isPreview = false) => {
+  const validateAndGenerate = async (isPreview = false) => {
     let isValid = true;
     let alertMessage = '';
 
@@ -239,12 +240,15 @@ const App: React.FC = () => {
       alert(alertMessage);
       return;
     }
-
+    
+    setIsGenerating(true);
     try {
-        generatePdf(formData, isPreview);
+        await generatePdf(formData, isPreview);
     } catch(e) {
         console.error("Error generating PDF:", e);
         alert("Ocurrió un error al generar el PDF. Revisa la consola para más detalles.");
+    } finally {
+        setIsGenerating(false);
     }
   };
   
@@ -571,11 +575,17 @@ const App: React.FC = () => {
           <div className="flex justify-between items-center gap-4 p-4 border-t border-slate-200 bg-slate-50">
             <span className="text-xs text-green-800">v39c · React/Tailwind Edition</span>
             <div className="flex gap-2">
-              <button onClick={() => validateAndGenerate(true)} className="bg-white border border-slate-300 text-slate-800 px-4 py-2.5 rounded-lg font-bold hover:bg-slate-100 transition-colors">
-                Previsualizar
+              <button 
+                onClick={() => validateAndGenerate(true)} 
+                disabled={isGenerating}
+                className="bg-white border border-slate-300 text-slate-800 px-4 py-2.5 rounded-lg font-bold hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                {isGenerating ? 'Generando...' : 'Previsualizar'}
               </button>
-              <button onClick={() => validateAndGenerate(false)} className="bg-slate-800 text-white px-4 py-2.5 rounded-lg font-bold hover:bg-slate-900 transition-colors">
-                Descargar PDF
+              <button 
+                onClick={() => validateAndGenerate(false)} 
+                disabled={isGenerating}
+                className="bg-slate-800 text-white px-4 py-2.5 rounded-lg font-bold hover:bg-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                {isGenerating ? 'Generando...' : 'Descargar PDF'}
               </button>
             </div>
           </div>

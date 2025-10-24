@@ -1,5 +1,5 @@
 import type { FormData } from '../types';
-import { logoBase64 } from '../assets';
+import { logoUrl } from '../assets';
 
 declare const jspdf: any;
 declare const QRCode: any;
@@ -8,6 +8,30 @@ let doc: any;
 let y: number;
 let m = 48; // margin
 let fullW: number;
+
+const getBase64ImageFromUrl = (imageUrl: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous'; // Handle CORS
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                ctx.drawImage(img, 0, 0);
+                const dataURL = canvas.toDataURL('image/png');
+                resolve(dataURL);
+            } else {
+                reject(new Error('Could not get canvas context'));
+            }
+        };
+        img.onerror = (error) => {
+            reject(error);
+        };
+        img.src = imageUrl;
+    });
+};
 
 const checkPageBreak = (increment = 0, margin = m): number => {
     const pageHeight = doc.internal.pageSize.height;
@@ -58,7 +82,7 @@ const drawWrappedText = (text: string | string[], isList = false) => {
   y += 15;
 }
 
-export const generatePdf = (formData: FormData, isPreview = false) => {
+export const generatePdf = async (formData: FormData, isPreview = false) => {
   const { jsPDF } = jspdf;
   doc = new jsPDF({ unit: 'pt', format: 'a4' });
   fullW = doc.internal.pageSize.width - m * 2;
@@ -70,12 +94,11 @@ export const generatePdf = (formData: FormData, isPreview = false) => {
   const titleText = `Encargo de gestión ${modeTitle} SIN EXCLUSIVA`;
   
   try {
-    // FIX: jsPDF needs the raw Base64 string, not the full Data URI.
-    // We strip the "data:image/png;base64," part.
-    const rawImage = logoBase64.split(',')[1];
+    const logoDataUrl = await getBase64ImageFromUrl(logoUrl);
+    const rawImage = logoDataUrl.split(',')[1];
     doc.addImage(rawImage, 'PNG', m, y, 144, 42.5);
   } catch (e) {
-    console.error("Could not add logo:", e);
+    console.error("Could not add logo from URL:", e);
     doc.setFontSize(10).setFont('helvetica', 'bold').text("Vida Home", m, y + 20);
   }
   doc.setFontSize(14).setFont('helvetica', 'bold').text(titleText, m + 160, y + 20);
