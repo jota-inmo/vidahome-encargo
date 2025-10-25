@@ -27,10 +27,12 @@ const App: React.FC = () => {
   } = useFormData();
 
   const handleGeneratePdf = async (isPreview = false) => {
-    const { isValid, message } = validateForm(formData);
-    if (!isValid) {
-      alert(message);
-      return;
+    if (!isPreview) {
+      const { isValid, message } = validateForm(formData);
+      if (!isValid) {
+        alert(message);
+        return;
+      }
     }
     
     setIsGenerating(true);
