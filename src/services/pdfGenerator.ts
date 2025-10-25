@@ -3,7 +3,7 @@ import type { FormData, Owner } from '../types/encargo.types';
 declare const jspdf: any;
 declare const QRCode: any;
 
-const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAACAAAAAHZCAYAAADaQ259AAAgAElEQVR4nOydeXxc1Zn/P+/cu29md5JdMkl2IksCSCAgQICgKKhARa1WW6tWLVVbB61WUav9q1Vb3fbAaqutVau2h1pb9bQKKtQqkCIgCRZkyZINsmSSyWSSyb33zrw/fu49d94kk0wyCZDMP79fP/femzff+c53vvOd933Oc54DAQiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIA-g-prod/g2/w/4f8f4A3+8AAAAASUVORK5CYII=";
+const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAACAAAAAHZCAYAAADaQ259AAAgAElEQVR4nOydeXxc1Zn/P+/cu29md5JdMkl2IksCSCAgQICgKKhARa1WW6tWLVVbB61WUav9q1Vb3fbAaqutVau2h1pb9bQKKtQqkCIgCRZkyZINsmSSyWSSyb33zrw/fu49d94kk0wyCZDMP79fP/femzff+c53vvOd933Oc54DAQiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIAiCIA-g-prod/g2/w/4f8f4A3+8AAAAASUVORK5CYII=";
 
 export const generatePdf = async (formData: FormData, isPreview = false) => {
   const { jsPDF } = jspdf;
@@ -44,36 +44,43 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
   
   const drawKeyValueRow = (
     key1: string, value1: string | undefined | null,
-    key2: string, value2: string | undefined | null
+    key2?: string | null, value2?: string | undefined | null
   ) => {
+    const value1Safe = (value1 && value1 !== '—') ? String(value1).trim() : '';
+    const value2Safe = (value2 && value2 !== '—') ? String(value2).trim() : '';
+
+    if (!value1Safe && !value2Safe) return;
+
     checkPageBreak(20);
     
+    const keyColWidth = 105;
     const col1X = m;
-    const col2X = m + fullW / 2;
-    const valueOffsetX = 70; // space for the key
-    const valueWidth = (fullW / 2) - valueOffsetX - 5; // 5 for padding
-
-    const value1Safe = (value1 && value1 !== '—') ? String(value1) : '';
-    const value2Safe = (value2 && value2 !== '—') ? String(value2) : '';
-
-    const lines1 = value1Safe ? doc.splitTextToSize(value1Safe, valueWidth) : [''];
-    const lines2 = value2Safe ? doc.splitTextToSize(value2Safe, valueWidth) : [''];
+    const value1X = col1X + keyColWidth;
+    const value1Width = (fullW / 2) - keyColWidth - 5;
     
-    const lineHeight = 12;
-    const rowHeight = Math.max(lines1.length, lines2.length) * lineHeight + 5;
+    const lines1 = value1Safe ? doc.splitTextToSize(value1Safe, value1Width) : [''];
+    let lines2 = [''];
+    
+    let rowHeight = lines1.length * 12 + 5;
+
+    if (key2 && value2Safe) {
+        const col2X = m + fullW / 2;
+        const value2X = col2X + keyColWidth;
+        const value2Width = (fullW / 2) - keyColWidth - 5;
+        lines2 = doc.splitTextToSize(value2Safe, value2Width);
+        rowHeight = Math.max(lines1.length, lines2.length) * 12 + 5;
+
+        doc.setFont('helvetica', 'bold');
+        doc.text(key2, col2X, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(lines2, value2X, y);
+    }
     
     if (value1Safe) {
         doc.setFont('helvetica', 'bold');
         doc.text(key1, col1X, y);
         doc.setFont('helvetica', 'normal');
-        doc.text(lines1, col1X + valueOffsetX, y);
-    }
-
-    if (value2Safe) {
-        doc.setFont('helvetica', 'bold');
-        doc.text(key2, col2X, y);
-        doc.setFont('helvetica', 'normal');
-        doc.text(lines2, col2X + valueOffsetX, y);
+        doc.text(lines1, value1X, y);
     }
     
     y += rowHeight;
@@ -248,19 +255,33 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
 
   if (residentialTypes.includes(formData.tipo_vivienda)) {
       y+=5;
-      drawKeyValue('Habitaciones:', formData.num_habitaciones);
-      drawKeyValue('Baños:', formData.num_banos);
-      drawKeyValue('Cocinas:', formData.num_cocinas);
-      drawKeyValue('Ascensor:', formData.res_asc);
-      drawKeyValue('Exterior/Interior:', formData.res_ext);
-      drawKeyValue('Orientación:', formData.res_ori);
-      drawKeyValue('Garaje:', formData.res_gar);
-      drawKeyValue('Trastero:', formData.res_tras);
-      if (formData.res_t1) drawKeyValue('Terraza 1 (m²):', formData.res_t1);
-      if (formData.res_t2) drawKeyValue('Terraza 2 (m²):', formData.res_t2);
-      if (formData.res_t3) drawKeyValue('Terraza 3 (m²):', formData.res_t3);
-      if (formData.res_patio) drawKeyValue('Patio (m²):', formData.res_patio);
-      if (formData.res_parcela) drawKeyValue('Parcela (m²):', formData.res_parcela);
+      doc.setFontSize(10);
+      
+      const details = [
+          { key: 'Habitaciones:', value: formData.num_habitaciones },
+          { key: 'Baños:', value: formData.num_banos },
+          { key: 'Cocinas:', value: formData.num_cocinas },
+          { key: 'Ascensor:', value: formData.res_asc },
+          { key: 'Exterior/Interior:', value: formData.res_ext },
+          { key: 'Orientación:', value: formData.res_ori },
+          { key: 'Garaje:', value: formData.res_gar },
+          { key: 'Trastero:', value: formData.res_tras },
+          { key: 'Terraza 1 (m²):', value: formData.res_t1 },
+          { key: 'Terraza 2 (m²):', value: formData.res_t2 },
+          { key: 'Terraza 3 (m²):', value: formData.res_t3 },
+          { key: 'Patio (m²):', value: formData.res_patio },
+          { key: 'Parcela (m²):', value: formData.res_parcela },
+      ].filter(d => d.value && d.value !== '—' && String(d.value).trim() !== '');
+
+      for (let i = 0; i < details.length; i += 2) {
+          const item1 = details[i];
+          const item2 = details[i + 1];
+          if (item2) {
+              drawKeyValueRow(item1.key, item1.value, item2.key, item2.value);
+          } else {
+              drawKeyValueRow(item1.key, item1.value);
+          }
+      }
   } else if (landTypes.includes(formData.tipo_vivienda)) {
       y+=5;
       drawKeyValue('Clasificación:', formData.ter_clas);
@@ -290,6 +311,7 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
         if(formData.tras_extras.length > 0) drawKeyValue('Extras:', formData.tras_extras.join(', '));
       }
   }
+
 
   // --- 4) Gastos, Ocupación y Llaves ---
   drawSectionTitle('4) Gastos, ocupación y llaves');
