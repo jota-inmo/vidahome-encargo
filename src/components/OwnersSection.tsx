@@ -1,12 +1,12 @@
 
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import { Section } from './Section';
 import type { FormData } from '../types/encargo.types';
 
 interface Props {
   formData: FormData;
-  handleOwnersCountChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  handleOwnerChange: (index: number, e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleOwnersCountChange: (e: ChangeEvent<HTMLSelectElement>) => void;
+  handleOwnerChange: (index: number, e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const OwnersSection: React.FC<Props> = ({ formData, handleOwnersCountChange, handleOwnerChange }) => {

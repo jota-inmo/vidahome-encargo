@@ -17,29 +17,25 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
   const checkPageBreak = (increment = 0) => {
     if (y + increment > doc.internal.pageSize.height - m) {
         doc.addPage();
-        y = m;
-        // Optionally re-draw header on new pages if needed
+        y = m + 50; // Add top margin for header on new pages
     }
   };
   
-  const drawHeaderAndFooter = () => {
+  const addHeaderAndFooter = () => {
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
-        // Header
-        doc.addImage(logoBase64, 'PNG', m, m - 10, 100, 34);
+        doc.addImage(logoBase64, 'PNG', m, m - 15, 100, 34);
         doc.setFont('helvetica', 'bold').setFontSize(14).setTextColor(15, 23, 42);
         const refText = `REF: ${formData.ref || '______'}`;
         const refWidth = doc.getTextWidth(refText);
-        doc.text(refText, doc.internal.pageSize.width - m - refWidth, m + 8);
+        doc.text(refText, doc.internal.pageSize.width - m - refWidth, m);
         
-        // Footer
         doc.setFont('helvetica', 'normal').setFontSize(8).setTextColor(100, 116, 139);
-        const footerText = `Vida Home Gandia S.L. · CIF B75472027 · Página ${i} de ${pageCount}`;
+        const footerText = `Vida Home Gandia S.L. · CIF B75472027 · ${new Date(formData.fecha).toLocaleDateString('es-ES')} · Página ${i} de ${pageCount}`;
         const footerWidth = doc.getTextWidth(footerText);
         doc.text(footerText, (doc.internal.pageSize.width - footerWidth) / 2, doc.internal.pageSize.height - 20);
     }
-    doc.setPage(1); // Return to the first page to continue drawing
   };
 
   const drawTitle = () => {
@@ -58,93 +54,54 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
     doc.text(title, m, y);
     y += 22;
   };
-
-  const drawKeyValue = (key: string, value: string | undefined | null, options: { width?: number, isFull?: boolean } = {}) => {
-    if (!value || value === '—') return;
+  
+  const drawKeyValue = (key: string, value: string | undefined | null, options: { isFull?: boolean } = {}) => {
+    if (!value || value === '—' || value.trim() === '') return;
     const keyWidth = 100;
-    const valWidth = options.isFull ? fullW - keyWidth : (options.width || fullW / 2) - keyWidth;
-    checkPageBreak(15);
+    const valWidth = options.isFull ? fullW - keyWidth : (fullW / 2) - keyWidth;
+    
     const lines = doc.splitTextToSize(String(value), valWidth);
+    const requiredHeight = lines.length * 11 + 4;
+    checkPageBreak(requiredHeight);
+
     doc.setFont('helvetica', 'bold').setFontSize(9).setTextColor(51, 65, 85);
     doc.text(key, m, y);
     doc.setFont('helvetica', 'normal').setFontSize(9).setTextColor(15, 23, 42);
     doc.text(lines, m + keyWidth, y);
-    const increment = lines.length * 11 + 4;
-    y += increment;
-    return increment;
+    y += requiredHeight;
   };
-
-  const drawTwoCols = (k1: string, v1: string, k2: string, v2: string) => {
-      const startY = y;
-      const h1 = drawKeyValue(k1,v1);
-      y = startY;
-      doc.text(k2, m + fullW/2, y, {isFull: false});
-      const h2 = drawKeyValue(k2,v2);
-      y = startY + Math.max(h1,h2);
-  }
-
-  const drawWrappedText = (text: string, options: { isListItem?: boolean } = {}) => {
-    checkPageBreak(20);
-    const indent = options.isListItem ? 15 : 0;
-    const lines = doc.splitTextToSize(text, fullW - indent);
-    doc.setFont('helvetica', 'normal').setFontSize(9).setTextColor(51, 65, 85);
-    if (options.isListItem) doc.text("•", m, y, {charSpace: 2});
-    doc.text(lines, m + indent, y, { lineHeightFactor: 1.5 });
-    y += lines.length * 9 * 1.5 + 4;
-  };
-
 
   // --- START DOCUMENT ---
   drawTitle();
 
-  // 1. GESTIÓN
-  drawSectionTitle('1. Datos de gestión');
+  // 1. GESTIÓN & PROPIETARIOS
+  drawSectionTitle('1. Intervinientes');
   const agent = formData.agente === 'Otro (especificar)' ? formData.agente_otro : formData.agente;
-  drawKeyValue('Fecha:', new Date(formData.fecha).toLocaleDateString('es-ES'));
-  drawKeyValue('Agente:', agent);
-  y += 15;
-
-  // 2. PROPIETARIOS
-  drawSectionTitle('2. Propietarios');
+  drawKeyValue('Fecha Encargo:', new Date(formData.fecha).toLocaleDateString('es-ES'));
+  drawKeyValue('Agente Vida Home:', agent);
+  y += 10;
   formData.owners.forEach((owner, i) => {
-      checkPageBreak(60);
-      doc.setFont('helvetica', 'bold').setFontSize(9).text(`Propietario ${i + 1}:`, m, y); y+=4;
-      drawKeyValue('Nombre:', owner.nombre);
+      doc.setFont('helvetica', 'bold').setFontSize(9).text(`Propietario ${i + 1}:`, m, y); y += 15;
+      drawKeyValue('Nombre:', owner.nombre, { isFull: true });
       drawKeyValue('Teléfono:', owner.telefono);
       drawKeyValue('DNI/NIE:', owner.dni);
       drawKeyValue('Email:', owner.email);
-      y += 5;
+      y += 10;
   });
-  y += 15;
 
-  // 3. INMUEBLE
-  drawSectionTitle('3. Inmueble');
+  // 2. INMUEBLE
+  drawSectionTitle('2. Inmueble');
   drawKeyValue('Tipo:', formData.tipo_vivienda);
   drawKeyValue('Dirección:', formData.dir, {isFull:true});
   drawKeyValue('Ref. Catastral:', formData.refcat);
   
-  if (formData.ubic_link) {
-    const qrEl = document.getElementById('qr_hidden');
-    if (qrEl) {
-        qrEl.innerHTML = '';
-        new QRCode(qrEl, { text: formData.ubic_link, width: 70, height: 70, correctLevel: QRCode.CorrectLevel.M });
-        const qrCanvas = qrEl.querySelector('canvas');
-        if (qrCanvas) {
-            checkPageBreak(100);
-            y += 5;
-            doc.addImage(qrCanvas.toDataURL('image/png'), 'PNG', m, y, 70, 70);
-            y += 85;
-        }
-    }
-  }
-  y += 15;
-  
   // FINALLY
-  drawHeaderAndFooter();
+  addHeaderAndFooter();
   
+  const filename = `Encargo_VidaHome_${(formData.ref || 'encargo').replace(/\s+/g,'_')}.pdf`
   if (isPreview) {
-    doc.output('dataurlnewwindow', {filename: `encargo_preview_${formData.ref || 'sin-ref'}.pdf`});
+    doc.output('dataurlnewwindow', {filename});
   } else {
-    doc.save(`Encargo_VidaHome_${(formData.ref || 'encargo').replace(/\s+/g,'_')}.pdf`);
+    doc.save(filename);
   }
 };

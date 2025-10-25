@@ -1,5 +1,4 @@
 
-// FIX: Import `ChangeEvent` from `react` to resolve namespace error.
 import { useState, useEffect, useCallback, useMemo, ChangeEvent } from 'react';
 import type { FormData, Owner, FormFieldChangeEvent } from '../types/encargo.types';
 import { initialFormData, initialOwner } from '../constants/formData';
@@ -59,7 +58,6 @@ export const useFormData = () => {
     }
   };
 
-  // FIX: Use `ChangeEvent` instead of `React.ChangeEvent`.
   const handleOwnersCountChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const count = parseInt(e.target.value, 10);
     setFormData(prev => {
@@ -71,7 +69,6 @@ export const useFormData = () => {
     });
   };
 
-  // FIX: Use `ChangeEvent` instead of `React.ChangeEvent`.
   const handleOwnerChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const fieldName = name.split('_')[0] as keyof Owner;
@@ -92,7 +89,7 @@ export const useFormData = () => {
             if (match) {
                 const index = parseInt(match[1], 10);
                 const key = match[2] as keyof Owner;
-                if (formData.owners[index] && formData.owners[index][key] && String(formData.owners[index][key]).trim() !== '') {
+                if (formData.owners[index]?.[key] && String(formData.owners[index][key]).trim() !== '') {
                     filledCount++;
                 }
             }

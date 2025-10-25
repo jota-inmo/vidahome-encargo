@@ -8,31 +8,41 @@ interface Props {
   handleChange: (e: FormFieldChangeEvent) => void;
 }
 
+const CheckboxGroup: React.FC<{
+    name: 'vistas' | 'servicios';
+    options: string[];
+    selected: string[];
+    onChange: (e: FormFieldChangeEvent) => void;
+}> = ({ name, options, selected, onChange }) => (
+    <div className="flex flex-wrap gap-2">
+        {options.map(option => (
+            <label key={option} className="flex items-center gap-2 border border-slate-300 rounded-full px-3 py-1.5 bg-white text-sm font-semibold cursor-pointer has-[:checked]:bg-sky-100 has-[:checked]:border-sky-400 transition-colors">
+                <input 
+                    type="checkbox" 
+                    name={`${name}-${option}`} 
+                    value={option}
+                    checked={selected.includes(option)} 
+                    onChange={onChange}
+                    className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
+                />
+                {option}
+            </label>
+        ))}
+    </div>
+);
+
+
 export const ObservationsSection: React.FC<Props> = ({ formData, handleChange }) => {
   return (
     <Section title="6) Observaciones y extras">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">Vistas</label>
-              <div className="flex flex-wrap gap-2">
-                  {['Mar', 'Montaña', 'Ambas', 'Ninguna'].map(vista => (
-                        <label key={vista} className="flex items-center gap-2 border border-slate-300 rounded-full px-3 py-1.5 bg-white text-sm font-semibold cursor-pointer has-[:checked]:bg-sky-100 has-[:checked]:border-sky-400 transition-colors">
-                          <input type="checkbox" name={`vistas-${vista}`} checked={formData.vistas.includes(vista)} onChange={handleChange} className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"/>
-                          {vista}
-                      </label>
-                  ))}
-              </div>
+              <CheckboxGroup name="vistas" options={['Mar', 'Montaña', 'Ambas', 'Ninguna']} selected={formData.vistas} onChange={handleChange} />
           </div>
           <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">Zonas/servicios</label>
-              <div className="flex flex-wrap gap-2">
-                    {['Piscina', 'Jardines', 'Tenis', 'Pádel', 'Sauna', 'Domótica'].map(srv => (
-                        <label key={srv} className="flex items-center gap-2 border border-slate-300 rounded-full px-3 py-1.5 bg-white text-sm font-semibold cursor-pointer has-[:checked]:bg-sky-100 has-[:checked]:border-sky-400 transition-colors">
-                          <input type="checkbox" name={`servicios-${srv}`} checked={formData.servicios.includes(srv)} onChange={handleChange} className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"/>
-                          {srv}
-                      </label>
-                  ))}
-              </div>
+              <CheckboxGroup name="servicios" options={['Piscina', 'Jardines', 'Tenis', 'Pádel', 'Sauna', 'Domótica']} selected={formData.servicios} onChange={handleChange} />
           </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">Otros (campo libre)</label>

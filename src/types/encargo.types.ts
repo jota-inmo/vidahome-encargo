@@ -1,5 +1,4 @@
 
-// FIX: Import `ChangeEvent` from `react` to resolve namespace error.
 import type { ChangeEvent } from 'react';
 
 export interface Owner {
@@ -93,5 +92,4 @@ export interface FormData {
   obs_otro: string;
 }
 
-// FIX: Use `ChangeEvent` type instead of `React.ChangeEvent`.
 export type FormFieldChangeEvent = ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
