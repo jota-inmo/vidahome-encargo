@@ -1,5 +1,5 @@
 import React from 'react';
-import { logoBase64 } from '../logo';
+import { logoUrl } from '../assets';
 
 interface HeaderProps {
     categoria: 'normal' | 'A';
@@ -10,7 +10,7 @@ export const Header: React.FC<HeaderProps> = ({ categoria }) => {
 
   return (
     <header className="flex flex-col md:flex-row gap-4 items-center p-4 border-b border-slate-200 bg-white rounded-t-2xl">
-      <img alt="Vida Home" src={logoBase64} className="w-48 h-auto object-contain" />
+      <img alt="Vida Home" src={logoUrl} className="w-48 h-auto object-contain" />
       <div className="text-center md:text-left">
         <div className="text-xl font-extrabold text-slate-800">
           Encargo de gestión {modeTitle} SIN EXCLUSIVA

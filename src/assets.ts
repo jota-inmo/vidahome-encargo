@@ -1,1 +1,1 @@
-export const logoUrl = "https://github.com/jota-inmo/logos-cc/blob/main/logo.png?raw=true";
+export const logoUrl = "https://raw.githubusercontent.com/jota-inmo/logos-cc/main/logo.png?raw=true";

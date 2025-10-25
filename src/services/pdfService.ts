@@ -1,4 +1,4 @@
-import type { FormData, Owner } from '../types';
+import type { FormData, Owner } from '../types/encargo.types';
 import { logoUrl } from '../assets';
 
 declare const jspdf: any;
@@ -69,36 +69,43 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
   
   const drawKeyValueRow = (
     key1: string, value1: string | undefined | null,
-    key2: string, value2: string | undefined | null
+    key2?: string | null, value2?: string | undefined | null
   ) => {
+    const value1Safe = (value1 && value1 !== '—') ? String(value1).trim() : '';
+    const value2Safe = (value2 && value2 !== '—') ? String(value2).trim() : '';
+
+    if (!value1Safe && !value2Safe) return;
+
     checkPageBreak(20);
     
+    const keyColWidth = 105;
     const col1X = m;
-    const col2X = m + fullW / 2;
-    const valueOffsetX = 70; // space for the key
-    const valueWidth = (fullW / 2) - valueOffsetX - 5; // 5 for padding
-
-    const value1Safe = (value1 && value1 !== '—') ? String(value1) : '';
-    const value2Safe = (value2 && value2 !== '—') ? String(value2) : '';
-
-    const lines1 = value1Safe ? doc.splitTextToSize(value1Safe, valueWidth) : [''];
-    const lines2 = value2Safe ? doc.splitTextToSize(value2Safe, valueWidth) : [''];
+    const value1X = col1X + keyColWidth;
+    const value1Width = (fullW / 2) - keyColWidth - 5;
     
-    const lineHeight = 12;
-    const rowHeight = Math.max(lines1.length, lines2.length) * lineHeight + 5;
+    const lines1 = value1Safe ? doc.splitTextToSize(value1Safe, value1Width) : [''];
+    let lines2 = [''];
+    
+    let rowHeight = lines1.length * 12 + 5;
+
+    if (key2 && value2Safe) {
+        const col2X = m + fullW / 2;
+        const value2X = col2X + keyColWidth;
+        const value2Width = (fullW / 2) - keyColWidth - 5;
+        lines2 = doc.splitTextToSize(value2Safe, value2Width);
+        rowHeight = Math.max(lines1.length, lines2.length) * 12 + 5;
+
+        doc.setFont('helvetica', 'bold');
+        doc.text(key2, col2X, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(lines2, value2X, y);
+    }
     
     if (value1Safe) {
         doc.setFont('helvetica', 'bold');
         doc.text(key1, col1X, y);
         doc.setFont('helvetica', 'normal');
-        doc.text(lines1, col1X + valueOffsetX, y);
-    }
-
-    if (value2Safe) {
-        doc.setFont('helvetica', 'bold');
-        doc.text(key2, col2X, y);
-        doc.setFont('helvetica', 'normal');
-        doc.text(lines2, col2X + valueOffsetX, y);
+        doc.text(lines1, value1X, y);
     }
     
     y += rowHeight;
@@ -165,6 +172,8 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
     'Modalidad:', formData.categoria === 'A' ? 'Alquiler (A)' : 'Venta'
   );
 
+  y += 15;
+
   // --- 2) Propietarios ---
   drawSectionTitle('2) Propietarios');
   const ownerCount = formData.owners.length;
@@ -218,16 +227,57 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
       y = Math.max(y1, y2) + 10;
   }
 
+  y += 15;
+
   // --- 3) Inmueble ---
   drawSectionTitle('3) Inmueble');
-  drawKeyValue('Tipo:', formData.tipo_vivienda);
-  drawKeyValue('Dirección:', formData.dir);
-  checkPageBreak(15);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Ref. Catastral:', m, y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(formData.refcat || '__________________________________', m + 150, y);
-  y += 15;
+  const blockStartY = y;
+  let textBlockY = y;
+  let qrCodeEndY = blockStartY;
+  const qrSize = 80;
+  let qrGenerated = false;
+
+  if (formData.ubic_link) {
+      const qrEl = document.getElementById('qr_hidden');
+      if (qrEl) {
+          qrEl.innerHTML = '';
+          try {
+              new QRCode(qrEl, { text: formData.ubic_link, width: qrSize, height: qrSize, correctLevel: QRCode.CorrectLevel.M });
+              const qrCanvas = qrEl.querySelector('canvas');
+              if (qrCanvas) {
+                  const qrImg = qrCanvas.toDataURL('image/png');
+                  const qrX = doc.internal.pageSize.width - m - qrSize;
+                  doc.addImage(qrImg, 'PNG', qrX, blockStartY, qrSize, qrSize);
+                  qrCodeEndY = blockStartY + qrSize + 5;
+                  qrGenerated = true;
+              }
+          } catch (e) {
+              console.error("Error generating QR Code", e);
+          }
+      }
+  }
+
+  const labelX = m;
+  const valueX = m + 90;
+  const valueWidth = fullW - (valueX - m) - (qrGenerated ? qrSize + 10 : 0);
+  doc.setFontSize(10);
+  
+  const drawKeyAndMultiLineValue = (key: string, value: string | undefined | null) => {
+      if (!value) return;
+      const lines = doc.splitTextToSize(String(value), valueWidth);
+      checkPageBreak(lines.length * 12 + 8);
+      doc.setFont('helvetica', 'bold');
+      doc.text(key, labelX, textBlockY);
+      doc.setFont('helvetica', 'normal');
+      doc.text(lines, valueX, textBlockY);
+      textBlockY += lines.length * 12 + 8;
+  };
+  
+  drawKeyAndMultiLineValue('Tipo:', formData.tipo_vivienda);
+  drawKeyAndMultiLineValue('Dirección:', formData.dir);
+  drawKeyAndMultiLineValue('Ref. Catastral:', formData.refcat || '---');
+  
+  y = Math.max(textBlockY, qrCodeEndY);
 
   const residentialTypes = ['Piso', 'Ático', 'Dúplex', 'Bajo', 'Casa/Chalet', 'Adosado', 'Unifamiliar'];
   const landTypes = ['Terreno urbano', 'Terreno rústico'];
@@ -235,19 +285,33 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
 
   if (residentialTypes.includes(formData.tipo_vivienda)) {
       y+=5;
-      drawKeyValue('Habitaciones:', formData.num_habitaciones);
-      drawKeyValue('Baños:', formData.num_banos);
-      drawKeyValue('Cocinas:', formData.num_cocinas);
-      drawKeyValue('Ascensor:', formData.res_asc);
-      drawKeyValue('Exterior/Interior:', formData.res_ext);
-      drawKeyValue('Orientación:', formData.res_ori);
-      drawKeyValue('Garaje:', formData.res_gar);
-      drawKeyValue('Trastero:', formData.res_tras);
-      if (formData.res_t1) drawKeyValue('Terraza 1 (m²):', formData.res_t1);
-      if (formData.res_t2) drawKeyValue('Terraza 2 (m²):', formData.res_t2);
-      if (formData.res_t3) drawKeyValue('Terraza 3 (m²):', formData.res_t3);
-      if (formData.res_patio) drawKeyValue('Patio (m²):', formData.res_patio);
-      if (formData.res_parcela) drawKeyValue('Parcela (m²):', formData.res_parcela);
+      doc.setFontSize(10);
+      
+      const details = [
+          { key: 'Habitaciones:', value: formData.num_habitaciones },
+          { key: 'Baños:', value: formData.num_banos },
+          { key: 'Cocinas:', value: formData.num_cocinas },
+          { key: 'Ascensor:', value: formData.res_asc },
+          { key: 'Exterior/Interior:', value: formData.res_ext },
+          { key: 'Orientación:', value: formData.res_ori },
+          { key: 'Garaje:', value: formData.res_gar },
+          { key: 'Trastero:', value: formData.res_tras },
+          { key: 'Terraza 1 (m²):', value: formData.res_t1 },
+          { key: 'Terraza 2 (m²):', value: formData.res_t2 },
+          { key: 'Terraza 3 (m²):', value: formData.res_t3 },
+          { key: 'Patio (m²):', value: formData.res_patio },
+          { key: 'Parcela (m²):', value: formData.res_parcela },
+      ].filter(d => d.value && d.value !== '—' && String(d.value).trim() !== '');
+
+      for (let i = 0; i < details.length; i += 2) {
+          const item1 = details[i];
+          const item2 = details[i + 1];
+          if (item2) {
+              drawKeyValueRow(item1.key, item1.value, item2.key, item2.value);
+          } else {
+              drawKeyValueRow(item1.key, item1.value);
+          }
+      }
   } else if (landTypes.includes(formData.tipo_vivienda)) {
       y+=5;
       drawKeyValue('Clasificación:', formData.ter_clas);
@@ -277,27 +341,8 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
         if(formData.tras_extras.length > 0) drawKeyValue('Extras:', formData.tras_extras.join(', '));
       }
   }
-  
-  // --- QR Code ---
-  if(formData.ubic_link) {
-    checkPageBreak(120);
-    const qrEl = document.getElementById('qr_hidden');
-    if (qrEl) {
-        qrEl.innerHTML = '';
-        new QRCode(qrEl, { text: formData.ubic_link, width: 90, height: 90, correctLevel: QRCode.CorrectLevel.M });
-        const qrCanvas = qrEl.querySelector('canvas');
-        if (qrCanvas) {
-            y += 15;
-            const qrImg = qrCanvas.toDataURL('image/png');
-            const qrX = m;
-            doc.addImage(qrImg, 'PNG', qrX, y, 90, 90);
-            doc.setFontSize(8).setFont('helvetica', 'normal');
-            doc.text('QR Ubicación', qrX + 45, y + 100, { align: 'center' });
-            y += 110;
-        }
-    }
-  }
 
+  y += 15;
 
   // --- 4) Gastos, Ocupación y Llaves ---
   drawSectionTitle('4) Gastos, ocupación y llaves');
@@ -317,6 +362,8 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
     if(formData.llaves_tel) drawKeyValue('Teléfono llaves:', formData.llaves_tel);
     if(formData.llaves_instr) drawKeyValue('Instrucciones:', formData.llaves_instr);
   }
+
+  y += 15;
 
   // --- 5) Condiciones ---
   drawSectionTitle('5) Condiciones económicas y cláusulas');
@@ -343,7 +390,7 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
     ];
     let specific = '';
     if (data.categoria === 'A') {
-        specific = "Devengo honorarios (alquiler): si Vida Home presenta por escrito un arrendatario que acepta renta/plazo ofrecidos y la Propiedad decide no arrendar en tales términos, se devengan los honorarios pactados. Si se arrienda a ese interesado (o interpuesta) dentro de 24 meses, se devengan.";
+        specific = "Devengo honorarios (alquiler): si Vida Home presenta por escrito un arrendatario que acepta renta/plazo ofrecidos y la Propiedad decide no arrendar en tales términos, se devengan los honorarios pactados. Si se arrienda a ese interesado (o interposta) dentro de 24 meses, se devengan.";
     } else {
         const honorarios = !isNaN(parseFloat(data.precio)) && parseFloat(data.precio) < 100000 ? '4000€ + IVA' : '4% + IVA';
         specific = `Devengo honorarios (venta): si Vida Home comunica por escrito un comprador identificado que acepta el precio y la Propiedad decide no transmitir por ese importe, abonará los honorarios pactados (${honorarios}).`;
@@ -356,6 +403,8 @@ export const generatePdf = async (formData: FormData, isPreview = false) => {
   }
   y += 5;
   getDynamicClauses(formData).forEach(clause => drawListText([clause]));
+
+  y += 15;
 
   // --- 6) Observaciones ---
   drawSectionTitle('6) Observaciones y extras');
