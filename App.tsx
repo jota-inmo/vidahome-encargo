@@ -137,16 +137,16 @@ const App: React.FC = () => {
   }, []);
 
   const allRequiredFields = useMemo(() => {
-    const fields = [...requiredFields];
+    const fields: (string | keyof FormData)[] = [...requiredFields];
     if (formData.agente === 'Otro (especificar)') {
       fields.push('agente_otro');
     }
     const ownerCount = parseInt(formData.owners_count, 10);
     for (let i = 0; i < ownerCount; i++) {
-        fields.push(`owners[${i}].nombre` as any, `owners[${i}].telefono` as any, `owners[${i}].dni` as any);
+        fields.push(`owners[${i}].nombre`, `owners[${i}].telefono`, `owners[${i}].dni`);
     }
     return fields;
-  }, [formData.agente, formData.owners_count]);
+  }, [formData.agente, formData.owners_count, formData.owners]);
 
   useEffect(() => {
     let filledCount = 0;
@@ -156,12 +156,12 @@ const App: React.FC = () => {
             if (match) {
                 const index = parseInt(match[1], 10);
                 const key = match[2] as keyof Owner;
-                if (formData.owners[index] && formData.owners[index][key]) {
+                if (formData.owners[index] && formData.owners[index][key] && String(formData.owners[index][key]).trim() !== '') {
                     filledCount++;
                 }
             }
         } else {
-            if (formData[fieldKey as keyof FormData]) {
+            if (formData[fieldKey as keyof FormData] && String(formData[fieldKey as keyof FormData]).trim() !== '') {
                 filledCount++;
             }
         }
@@ -218,22 +218,28 @@ const App: React.FC = () => {
     let alertMessage = '';
 
     allRequiredFields.forEach(fieldKey => {
+      let isFieldValid = false;
       if (String(fieldKey).startsWith('owners')) {
         const match = String(fieldKey).match(/owners\[(\d+)]\.(\w+)/);
         if (match) {
           const index = parseInt(match[1], 10);
           const key = match[2] as keyof Owner;
-          if (!formData.owners[index] || !formData.owners[index][key]) {
-            isValid = false;
+          if (formData.owners[index] && formData.owners[index][key] && String(formData.owners[index][key]).trim()) {
+            isFieldValid = true;
+          } else {
             if (!alertMessage) alertMessage = `Propietario ${index+1}: Falta ${key}`;
           }
         }
       } else {
-        if (!formData[fieldKey as keyof FormData]) {
-          isValid = false;
-          if (!alertMessage) alertMessage = `Falta campo requerido: ${String(fieldKey)}`;
+        if (formData[fieldKey as keyof FormData] && String(formData[fieldKey as keyof FormData]).trim()) {
+            isFieldValid = true;
+        } else {
+          if (!alertMessage) {
+            alertMessage = `Falta campo requerido: ${String(fieldKey)}`;
+          }
         }
       }
+      if (!isFieldValid) isValid = false;
     });
 
     if (!isValid) {
@@ -531,7 +537,7 @@ const App: React.FC = () => {
                     <li><b className="font-semibold">- Aceptación y arras:</b> una vez aceptada por escrito la oferta por la Propiedad, Vida Home elaborará un borrador de contrato de arras, lo ajustará con las partes hasta su conformidad por escrito y coordinará firma e ingreso de las arras.</li>
                     <li><b className="font-semibold">- Arras – destino del ingreso:</b> las arras de la parte compradora se ingresarán en la cuenta del propietario si tiene cuenta en España; si no, se ingresarán en la cuenta de Vida Home para custodia temporal y posterior transferencia o aplicación según contrato de arras.</li>
                     {formData.categoria === 'A' ? (
-                        <li><b className="font-semibold">- Devengo honorarios (alquiler):</b> si Vida Home presenta por escrito un arrendatario que acepta renta/plazo ofrecidos y la Propiedad decide no arrendar en tales términos, se devengan los honorarios pactados. Si se arrienda a ese interesado (o interpuesta) dentro de 24 meses, se devengan.</li>
+                        <li><b className="font-semibold">- Devengo honorarios (alquiler):</b> si Vida Home presenta por escrito un arrendatario que acepta renta/plazo ofrecidos y la Propiedad decide no arrendar en tales términos, se devengan los honorarios pactados. Si se arrienda a ese interesado (o interposta) dentro de 24 meses, se devengan.</li>
                     ) : (
                         <li><b className="font-semibold">- Devengo honorarios (venta):</b> {devengoHonorariosVentaText}</li>
                     )}
